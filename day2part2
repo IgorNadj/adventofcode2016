@@ -1,0 +1,25 @@
+var raw = document.body.textContent;
+var lines = raw.split('\n');
+var isTriangle = function(a, b, c) {
+  a = parseInt(a, 10);
+  b = parseInt(b, 10);
+  c = parseInt(c, 10);
+  return a+b>c && a+c>b && b+c>a;
+}
+var splitLine = function(line) {
+  if(!line) return [0,0,0];
+  return line.trim().replace(/\s+/g, '|').split('|');
+}
+var numTriangles = 0;
+for (var i = 0; i < lines.length; ) {
+  var l1 = splitLine(lines[i]);
+  i++;
+  var l2 = splitLine(lines[i]);
+  i++;
+  var l3 = splitLine(lines[i]);
+  i++;
+  if(isTriangle(l1[0], l2[0], l3[0])) numTriangles++;
+  if(isTriangle(l1[1], l2[1], l3[1])) numTriangles++;
+  if(isTriangle(l1[2], l2[2], l3[2])) numTriangles++;
+}
+numTriangles;
