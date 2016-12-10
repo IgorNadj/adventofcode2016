@@ -1,0 +1,101 @@
+var raw = document.body.textContent;
+var lines = raw.split('\n');
+var items = lines.map(line => { 
+  line = line.substring(0, line.length-1);
+  var p1 = line.split('[');
+  var checksum = p1[1];
+  var p2 = p1[0].split('-');
+  var sectorId = parseInt(p2[p2.length-1], 10);
+  delete p2[p2.length-1];
+  return {
+    sectorId: sectorId,
+    givenChecksum: checksum,
+    chars: p2.join('').replace(/-/g, ''),
+    origChars: p1[0],
+  }
+});
+var numOccurances = function(char, chars) {
+  var noneOfThose = chars.split(char).join('');
+  return chars.length - noneOfThose.length;
+}
+//var firstIndexOf = function(char, chars) {
+//  return chars.indexOf(char);
+//}
+items.map(item => {
+  var charData = item.chars.split('').map(char => {
+    return {
+      char: char,
+      //firstIndex: firstIndexOf(char, item.chars),
+      numOccurances: numOccurances(char, item.chars)
+    }
+  });
+  var uniqueCharData = [];
+  for(var i in charData) {
+    var dupe = false;
+    for(var j in uniqueCharData){
+      if(uniqueCharData[j].char === charData[i].char){
+        dupe = true;
+        break;
+      }
+    }
+    if(!dupe) uniqueCharData.push(charData[i]);
+  }
+  charData = uniqueCharData;
+  item.charData = charData;
+  return item;
+});
+
+var checksum = function(item){
+  var r = '';
+  var _charData = JSON.parse(JSON.stringify(item.charData));
+  // most occurances first
+  _charData.sort((a, b) => {
+    if(a.numOccurances > b.numOccurances) return -1;
+    if(a.numOccurances < b.numOccurances) return 1;
+    if(a.char < b.char) return -1; // sort alphabetically
+    if(a.char > b.char) return 1;
+    return 0;
+  });
+  for(var i in _charData){
+    r = r + _charData[i].char;
+    if(r.length >= 5) break;
+  }
+  //console.log(JSON.stringify(item.charData),JSON.stringify(_charData),r);
+  return r;
+}
+items.map(item => {
+  item.checksum = checksum(item);
+  return item;
+});
+//console.log(items);
+
+items = items.filter(item => {
+  return item.checksum == item.givenChecksum;
+});
+console.log(items.length + ' / ' + lines.length + ' valid');
+
+var sectorIdSum = 0;
+items.forEach(item => {
+  sectorIdSum += item.sectorId;
+});
+sectorIdSum;
+
+var shiftChars = function(str, num){
+  var alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');  
+  var r = '';
+  for(var i in str){
+    var pos = alphabet.indexOf(str[i]);
+    if(pos === -1){
+      r += str[i];
+      continue;
+    }
+    pos += num;
+    while(pos>=26) pos-=26;
+    r += alphabet[pos];
+  }
+  return r;
+}
+
+items.forEach(item => {
+  console.log(item.origChars, item.sectorId, shiftChars(item.origChars, item.sectorId));
+});
