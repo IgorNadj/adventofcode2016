@@ -1,0 +1,58 @@
+var raw = document.body.textContent;
+var lines = raw.split('\n');
+
+function ipv7(line){
+	var parts = line.split(/(\[[a-z]+\])/g);
+	var supernet = [];
+	var hypernet = [];
+	parts.forEach(part => {
+		if(part.indexOf('[') === -1){
+			supernet.push(part);
+		}else{
+			hypernet.push(part.replace('[', '').replace(']', ''));
+		}
+	});
+	return {
+		supernet: supernet,
+		hypernet: hypernet
+	};
+}
+
+function hasAbaAndBab(str1, str2, delimiter){
+	for(var i=0; i<str1.length-2; i++){
+		var aba = str1.substring(i, i+3);
+		if(!isAba(aba, delimiter)){
+			continue;
+		}
+		var bab = babFromAba(aba);
+		if(str2.indexOf(bab) !== -1){
+			return true;
+		}
+	}
+	return false;
+}
+
+function isAba(str, delimiter){
+	if(str[0] === str[1]) return false; // two of the same chars
+	if(str.indexOf(delimiter) !== -1) return false; // overflow
+	if(str[0] === str[2]){
+		return true;
+	}
+	return false;
+}
+
+function babFromAba(aba){
+	return aba.substring(1,2)+aba.substring(0,1)+aba.substring(1,2);
+}
+
+var sslSupportedIps = lines.filter(line => {
+	var ip = ipv7(line);
+	if(!ip.supernet) return false;
+
+	var supernetStr = ip.supernet.join('|'); // use special char to prevent crossover
+	var hypernetStr = ip.hypernet.join('|');
+
+	return(hasAbaAndBab(supernetStr, hypernetStr, '|'));
+});
+
+console.log(sslSupportedIps.length + ' / ' + lines.length);
