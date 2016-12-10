@@ -1,0 +1,29 @@
+var raw = document.body.textContent;
+var lines = raw.split('\n');
+
+var out = '';
+for(var col=0; col<8; col++){
+  var charCounts = {};
+  for(var i in lines){
+    if(!lines[i]) continue;
+    var char = lines[i][col];
+    if(charCounts[char] === undefined) charCounts[char] = -1;
+    charCounts[char] = charCounts[char]+1;
+  }
+  out += maxAttr(charCounts);
+}
+
+function maxAttr(obj){
+	var maxKey = null;
+	var maxVal = null;
+	var attrs = Object.keys(obj);
+	for(var i in attrs){
+		var k = attrs[i];
+		var v = obj[k];
+		if(maxKey === null || v > maxVal){
+			maxKey = k;
+			maxVal = v;
+		}
+	}
+	return maxKey;
+}
