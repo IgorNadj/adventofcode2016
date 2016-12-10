@@ -1,0 +1,48 @@
+var raw = document.body.textContent;
+var lines = raw.split('\n');
+
+function ipv7(line){
+	var parts = line.split(/(\[[a-z]+\])/g);
+	var standard = [];
+	var hypernet = [];
+	parts.forEach(part => {
+		if(part.indexOf('[') === -1){
+			standard.push(part);
+		}else{
+			hypernet.push(part.replace('[', '').replace(']', ''));
+		}
+	});
+	return {
+		standard: standard,
+		hypernet: hypernet
+	};
+}
+
+function hasAbba(str){
+	for(var i=0;i<str.length-3;i++){
+		if(str[i] === str[i+1]) continue; // two of the same chars
+		if(str[i] === str[i+3] && str[i+1] === str[i+2]){
+			return true;
+		}
+	}
+	return false;
+}
+
+var tlsSupportedIps = lines.filter(line => {
+	var ip = ipv7(line);
+	if(!ip.standard) return false;
+	var tlsSupported = false;
+	for(var i in ip.standard){
+		if(hasAbba(ip.standard[i])){
+			tlsSupported = true;
+		}
+	};
+	for(var i in ip.hypernet){
+		if(hasAbba(ip.hypernet[i])){
+			tlsSupported = false;
+		}
+	};
+	return tlsSupported;
+});
+
+console.log(tlsSupportedIps.length + ' / ' + lines.length);
