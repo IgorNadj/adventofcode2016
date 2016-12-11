@@ -1,0 +1,37 @@
+var raw = document.body.textContent;
+var allInput = raw.trim();
+
+
+
+function decompressedLen(input){
+  var outputLen = 0;
+  var pos = 0;
+  while(pos < input.length){
+    var char = input[pos];
+    if(char === '('){
+      //console.log('rest', input.substring(pos));
+      var closingBracketPos = pos + input.substring(pos).indexOf(')');
+      var markerStr = input.substring(pos+1, closingBracketPos);
+      var markerParts = markerStr.split('x');
+      var numChars = parseInt(markerParts[0],10);
+      var numReps = parseInt(markerParts[1],10);
+      //console.log('markerStr', markerStr);
+      //console.log(numChars, numReps);
+      var charsToRepeat = input.substring(closingBracketPos+1, closingBracketPos+1+numChars);
+      
+      var charsToRepeatLen = decompressedLen(charsToRepeat);
+      outputLen += (charsToRepeatLen * numReps);
+
+      pos = closingBracketPos+1+numChars;
+    }else{
+      outputLen++;
+      pos++;
+    }
+  }
+  return outputLen;
+}
+
+var len = decompressedLen(allInput);
+
+
+len;
