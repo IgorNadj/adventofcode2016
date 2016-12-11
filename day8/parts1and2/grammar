@@ -1,0 +1,30 @@
+{
+  function i(o) {
+    return parseInt(o.join(""), 10);
+  }
+}
+
+Expression
+  = Line+
+  
+Line
+  = rule:Rule linebreak?
+  { return rule; }
+  
+Rule
+  = a:Rect / b:RotateRow / c:RotateCol
+  
+Rect
+  = 'rect ' x:[0-9]+ 'x' y:[0-9]+ 
+  { return { type: 'Rect', x: i(x), y: i(y)} }  
+  
+RotateRow
+  = 'rotate row y=' y:[0-9]+ ' by ' num:[0-9]+ 
+  { return { type: 'RotateRow', y: i(y), num: i(num) } }
+  
+RotateCol
+  = 'rotate column x=' x:[0-9]+ ' by ' num:[0-9]+ 
+  { return { type: 'RotateCol', x: i(x), num: i(num) } }
+  
+linebreak
+  = [\n] { return null; }
