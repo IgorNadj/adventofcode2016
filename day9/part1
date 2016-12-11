@@ -1,0 +1,29 @@
+var raw = document.body.textContent;
+var input = raw.trim();
+
+var output = '';
+
+var pos = 0;
+while(pos < input.length){
+  var char = input[pos];
+  if(char === '('){
+    //console.log('rest', input.substring(pos));
+    var closingBracketPos = pos + input.substring(pos).indexOf(')');
+    var markerStr = input.substring(pos+1, closingBracketPos);
+    var markerParts = markerStr.split('x');
+    var numChars = parseInt(markerParts[0],10);
+    var numReps = parseInt(markerParts[1],10);
+    //console.log('markerStr', markerStr);
+    //console.log(numChars, numReps);
+    var charsToRepeat = input.substring(closingBracketPos+1, closingBracketPos+1+numChars);
+    //console.log('charsToRepeat', charsToRepeat);
+    for(var i=0; i<numReps; i++){
+      output += charsToRepeat;
+    }
+    pos = closingBracketPos+1+numChars;
+  }else{
+    output += char;
+    pos++;
+  }
+}
+output.length;
